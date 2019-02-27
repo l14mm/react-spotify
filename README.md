@@ -1,1 +1,1 @@
-## A react spotify player
+## A react spotify player

@@ -12,6 +12,7 @@ class App extends Component {
       trackName: "Track Name",
       artistName: "Artist Name",
       albumName: "Album Name",
+      albumArt: "",
       playing: false,
       position: 0,
       duration: 0,
@@ -20,13 +21,15 @@ class App extends Component {
   }
 
   onStateChanged(state) {
-    // if we're no longer listening to music, we'll get a null state.
+    // State is null when music stops
     if (state !== null) {
       const {
         current_track: currentTrack,
         position,
         duration,
       } = state.track_window;
+      console.log(currentTrack)
+      const albumArt = currentTrack.album.images[0].url;
       const trackName = currentTrack.name;
       const albumName = currentTrack.album.name;
       const artistName = currentTrack.artists
@@ -38,6 +41,7 @@ class App extends Component {
         duration,
         trackName,
         albumName,
+        albumArt,
         artistName,
         playing
       });
@@ -47,7 +51,6 @@ class App extends Component {
   handleLogin() {
     if (this.state.token !== "") {
       this.setState({ loggedIn: true });
-      // check every second for the player.
       this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
     }
   }
@@ -76,7 +79,6 @@ class App extends Component {
 
   checkForPlayer() {
     const { token } = this.state;
-    console.log(window)
     if (window.Spotify !== null) {
       clearInterval(this.playerCheckInterval);
       this.player = new window.Spotify.Player({
@@ -105,7 +107,7 @@ class App extends Component {
       body: JSON.stringify({
         "device_ids": [deviceId],
         "play": true,
-      }),
+      })
     });
   }
 
@@ -116,6 +118,7 @@ class App extends Component {
       artistName,
       trackName,
       albumName,
+      albumArt,
       error,
       position,
       duration,
@@ -134,6 +137,7 @@ class App extends Component {
               <p>Artist: {artistName}</p>
               <p>Track: {trackName}</p>
               <p>Album: {albumName}</p>
+              {albumArt && <img src={albumArt} alt="albumArt" />}
               <p>
                 <button onClick={() => this.onPrevClick()}>Previous</button>
                 <button onClick={() => this.onPlayClick()}>{playing ? "Pause" : "Play"}</button>
