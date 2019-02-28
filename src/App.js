@@ -6,6 +6,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MySnackbarContentWrapper from './Components/MySnackbarContentWrapper';
 import grey from '@material-ui/core/colors/grey';
 import Icon from '@material-ui/core/Icon';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
@@ -55,6 +56,13 @@ class App extends Component {
         duration,
       } = state;
       const playing = !state.paused;
+      if (playing && !this.timer) {
+        // Increase time by 1 second every second
+        this.timer = setInterval(() => {console.log(this.state.position); this.setState({position: this.state.position + 1000})}, 1000)
+      }
+      else {
+        clearInterval(this.timer)
+      }
       this.setState({
         position,
         duration,
@@ -188,6 +196,12 @@ class App extends Component {
       snackbarVariant,
       snackbarMessage
     } = this.state;
+    const dur = Math.floor(duration/1000)
+    const pos = Math.floor(position/1000)
+    var durationMinutes = Math.floor(dur / 60);
+    var durationSeconds = dur - durationMinutes * 60;
+    var currentMinutes = Math.floor(pos / 60);
+    var currentSeconds = pos - currentMinutes * 60;
 
     return (
       <div className="App">
@@ -201,8 +215,9 @@ class App extends Component {
               <p>Artist: {artistName}</p>
               <p>Track: {trackName}</p>
               <p>Album: {albumName}</p>
-              <p>Position: {position}</p>
-              <p>Duration: {duration}</p>
+              <p>Position: {currentMinutes}:{currentSeconds}</p>
+              <p>Duration: {durationMinutes}:{durationSeconds}</p>
+              <LinearProgress variant="determinate" value={position/duration*100} />
               {albumArt && <img src={albumArt} alt="albumArt" />}
               <p>
                 <Icon
