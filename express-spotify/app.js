@@ -18,8 +18,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const scope = 'streaming user-read-birthdate user-read-email user-read-private' + // Scope required for spotify sdk
-              ' user-read-currently-playing'; // Currently playing track
+const scope = 'streaming user-read-birthdate user-read-email user-read-private' // Scope required for spotify sdk
+              + ' user-read-currently-playing' // Currently playing track
+              + ' user-read-recently-played'
+              + ' user-modify-playback-state'
+              ;
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = 'http://localhost:3001/callback';

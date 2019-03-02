@@ -3,8 +3,16 @@ import '../App.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import MySnackbarContentWrapper from './MySnackbarContentWrapper';
 import grey from '@material-ui/core/colors/grey';
-import Icon from '@material-ui/core/Icon';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import PauseIcon from '@material-ui/icons/Pause';
+import SkipNextIcon from '@material-ui/icons/SkipNext';
 import queryString from 'query-string';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -21,6 +29,30 @@ const styles = theme => ({
     },
     margin: {
         margin: theme.spacing.unit,
+    },
+    card: {
+        display: 'flex',
+        color: 'black'
+    },
+    details: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    content: {
+        flex: '1 0 auto',
+    },
+    cover: {
+        width: 151,
+    },
+    controls: {
+        display: 'flex',
+        alignItems: 'center',
+        paddingLeft: theme.spacing.unit,
+        paddingBottom: theme.spacing.unit,
+    },
+    playIcon: {
+        height: 38,
+        width: 38,
     },
 });
 
@@ -51,10 +83,44 @@ class Home extends Component {
                 window.location.href = 'http://localhost:3001';
             }
             else {
-                this.setState({ loggedIn: true, access_token });
-                this.playerCheckInterval = setInterval(() => this.checkForPlayer(), 1000);
+                this.setState({ 
+                    loggedIn: true, 
+                    access_token,
+                    snackbarOpen: true,
+                    snackbarVariant: "success",
+                    snackbarMessage: "Connected!"
+                });
+
+                fetch('https://api.spotify.com/v1/me/' + 'player/recently-played', {
+                    headers: {
+                        'Authorization': 'Bearer ' + access_token,
+                        'Accept': 'application/json'
+                    }
+                }).then(response => response.json()).then(json => {
+                    const recentlyPlayed = json.items
+                    // Start playing the most recently played track
+                    this.playTrack(recentlyPlayed[0]);
+                })
             }
         }
+    }
+
+    playTrack(track) {
+        const currentTrack = track.track;
+        this.setState({
+            position: 0,
+            duration: currentTrack.duration_ms,
+            trackName: currentTrack.name,
+            albumName: currentTrack.album.name,
+            albumArt: currentTrack.album.images[0].url,
+            artistName: currentTrack.artists
+                .map(artist => artist.name)
+                .join(", "),
+            playing: true
+        });
+        this.audio = new Audio(currentTrack.preview_url);
+        this.audio.play();
+        this.timer = setInterval(() => this.setState({ position: this.state.position + 1000 }), 1000);
     }
 
     onStateChanged(state) {
@@ -89,96 +155,25 @@ class Home extends Component {
         }
     }
 
-    createEventHandlers() {
-        this.player.on('initialization_error', e => {
-            console.error(e);
-            this.setState({
-                snackbarOpen: true,
-                snackbarVariant: "error",
-                snackbarMessage: "Initialization error"
-            });
-        });
-        this.player.on('authentication_error', e => {
-            console.error(e);
-            this.setState({
-                loggedIn: false,
-                snackbarOpen: true,
-                snackbarVariant: "error",
-                snackbarMessage: "Authentication error"
-            });
-        });
-        this.player.on('account_error', e => {
-            console.error(e);
-            this.setState({
-                snackbarOpen: true,
-                snackbarVariant: "error",
-                snackbarMessage: "Account error"
-            });
-        });
-        this.player.on('playback_error', e => {
-            console.error(e);
-            this.setState({
-                snackbarOpen: true,
-                snackbarVariant: "warning",
-                snackbarMessage: "Playback error"
-            });
-        });
+    // onPrevClick() { this.player.previousTrack(); }
 
-        this.player.on('player_state_changed', state => this.onStateChanged(state));
+    onPlayClick = () => {
+        if (this.state.playing) this.audio.pause();
+        else this.audio.play()
+        const playing = !this.state.playing;
+        this.setState({ playing })
 
-        this.player.on('ready', async ({ device_id }) => {
-            await this.setState({
-                deviceId: device_id,
-                snackbarOpen: true,
-                snackbarVariant: "success",
-                snackbarMessage: "Connected!"
-            });
-            this.transferPlaybackHere();
-        });
-
-        this.player.addListener('not_ready', ({ device_id }) => {
-            console.log('Device ID has gone offline', device_id);
-            this.setState({
-                snackbarOpen: true,
-                snackbarVariant: "info",
-                snackbarMessage: "Device has gone offline"
-            });
-        });
-    }
-
-    checkForPlayer() {
-        const { access_token } = this.state;
-        if (window.Spotify !== null) {
-            clearInterval(this.playerCheckInterval);
-            this.player = new window.Spotify.Player({
-                name: "React Spotify Player",
-                getOAuthToken: cb => { cb(access_token); },
-            });
-            this.createEventHandlers();
-            this.player.connect();
+        if (playing && !this.timer) {
+            // Increase time by 1 second every second
+            this.timer = setInterval(() => this.setState({ position: this.state.position + 1000 }), 1000);
+        }
+        else if (!playing && this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
         }
     }
 
-    onPrevClick() { this.player.previousTrack(); }
-
-    onPlayClick() { this.player.togglePlay(); }
-
-    onNextClick() { this.player.nextTrack(); }
-
-    transferPlaybackHere() {
-        const { deviceId, access_token } = this.state;
-        fetch("https://api.spotify.com/v1/me/player", {
-            method: "PUT",
-            headers: {
-                authorization: `Bearer ${access_token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                "device_ids": [deviceId],
-                "play": true,
-            })
-        });
-    }
+    // onNextClick() { this.player.nextTrack(); }
 
     handleClose = (event, reason) => {
         if (reason !== 'clickaway') { this.setState({ snackbarOpen: false }); }
@@ -214,53 +209,52 @@ class Home extends Component {
                     <h2>React Spotify Player</h2>
                     {loggedIn ?
                         (<div>
-                            <p>Artist: {artistName}</p>
-                            <p>Track: {trackName}</p>
-                            <p>Album: {albumName}</p>
-                            <p>Position: {currentMinutes}:{currentSecondsStr}</p>
-                            <p>Duration: {durationMinutes}:{durationSecondsStr}</p>
-                            <LinearProgress variant="determinate" value={position / duration * 100} />
-                            {albumArt && <img src={albumArt} alt="albumArt" />}
-                            <p>
-                                <Icon
-                                    className={classes.buttonHover}
-                                    color="primary"
-                                    fontSize="large"
-                                    onClick={() => this.onPrevClick()}
-                                >
-                                    skip_previous
-                                </Icon>
-                                <Icon
-                                    className={classes.buttonHover}
-                                    color="primary"
-                                    fontSize="large"
-                                    onClick={() => this.onPlayClick()}
-                                >
-                                    {playing ? 'pause' : 'play_arrow'}
-                                </Icon>
-                                <Icon
-                                    className={classes.buttonHover}
-                                    color="primary"
-                                    fontSize="large"
-                                    onClick={() => this.onNextClick()}
-                                >
-                                    skip_next
-                                </Icon>
-                            </p>
+                            <Card className={classes.card}>
+                                <div className={classes.details}>
+                                    <CardContent className={classes.content}>
+                                        <Typography component="h5" variant="h5">
+                                            {trackName}
+                                        </Typography>
+                                        <Typography variant="subtitle1" color="textSecondary">
+                                            {artistName}
+                                        </Typography>
+                                    </CardContent>
+                                    <div className={classes.controls}>
+                                        <IconButton aria-label="Previous" onClick={() => this.onPrevClick()}>
+                                            <SkipPreviousIcon />
+                                        </IconButton>
+                                        <IconButton aria-label="Play/pause" onClick={() => this.onPlayClick()}>
+                                            {playing ? <PauseIcon className={classes.playIcon} /> : <PlayArrowIcon className={classes.playIcon} />}
+                                        </IconButton>
+                                        <IconButton aria-label="Next" onClick={() => this.onNextClick()}>
+                                            <SkipNextIcon />
+                                        </IconButton>
+                                    </div>
+                                    <div style={{'display':'flex','flexDirection':'column'}} className={classes.playbackBar}>
+                                        <div className={classes.playbackBarTime}>
+                                            <p style={{'fontSize':'12px','float':'left','margin':'0 0 0 2px'}}>{currentMinutes}:{currentSecondsStr}</p>
+                                            <p style={{'fontSize':'12px','float':'right','margin':'0 2px 0 0'}}>{durationMinutes}:{durationSecondsStr}</p>
+                                        </div>
+                                        <LinearProgress style={{}} variant="determinate" value={position / duration * 100} />
+                                    </div>
+                                    <CardMedia
+                                        className={classes.cover}
+                                        image={albumArt}
+                                        title={albumName}
+                                    />
+                                </div>
+                            </Card>
                         </div>)
                         :
                         (<div>
                             <p className="App-intro">
-                                Enter your Spotify access token. Get it from{" "}
-                                <a href="https://beta.developer.spotify.com/documentation/web-playback-sdk/quick-start/#authenticating-with-spotify">
-                                    here
-                                </a>.
+                                Not logged in
                             </p>
                             <p>
                                 <input type="text" value={token} onChange={e => this.setState({ token: e.target.value })} />
                             </p>
                             <p>
-                                <button onClick={() => this.handleLogin()}>Go</button>
+                                <button onClick={() => this.handleLogin()}>Login</button>
                             </p>
                         </div>)
                     }
@@ -271,7 +265,7 @@ class Home extends Component {
                         horizontal: 'left',
                     }}
                     open={snackbarOpen}
-                    autoHideDuration={6000}
+                    autoHideDuration={2000}
                     onClose={this.handleClose}
                 >
                     <MySnackbarContentWrapper
