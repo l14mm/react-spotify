@@ -51,6 +51,20 @@ const styles = theme => ({
   playIcon: {
     height: 38,
     width: 38
+  },
+  playbackBar: {
+    display: "flex",
+    flexDirection: "column"
+  },
+  playbackBarCurrentTime: {
+    fontSize: "12px",
+    float: "left",
+    margin: "0 0 0 2px"
+  },
+  playbackBarTotalTime: {
+    fontSize: "12px",
+    float: "right",
+    margin: "0 2px 0 0"
   }
 });
 
@@ -97,32 +111,22 @@ const PlaybackBar = ({
             <SkipNextIcon />
           </IconButton>
         </div>
-        <div
-          style={{ display: "flex", flexDirection: "column" }}
-          className={classes.playbackBar}
-        >
+        <div className={classes.playbackBar}>
           <div className={classes.playbackBarTime}>
-            <p style={{ fontSize: "12px", float: "left", margin: "0 0 0 2px" }}>
+            <p className={classes.playbackBarCurrentTime}>
               {currentMinutes}:{currentSecondsStr}
             </p>
-            <p
-              style={{ fontSize: "12px", float: "right", margin: "0 2px 0 0" }}
-            >
+            <p className={classes.playbackBarTotalTime}>
               {durationMinutes}:{durationSecondsStr}
             </p>
           </div>
           <LinearProgress
-            style={{}}
             variant="determinate"
             value={(position / duration) * 100}
           />
         </div>
-        <CardMedia
-          className={classes.cover}
-          image={albumArt}
-          title={albumName}
-        />
       </div>
+      <CardMedia className={classes.cover} image={albumArt} title={albumName} />
     </Card>
   );
 };

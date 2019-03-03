@@ -205,46 +205,41 @@ class Home extends Component {
     const currentSecondsStr =
       currentSeconds < 10 ? `0${currentSeconds}` : currentSeconds;
     return (
-      <div className="App">
-        <div className="App-header">
-          <h2>React Spotify Player</h2>
-          {loggedIn ? (
-            <div>
-              <PlaybackBar
-                trackName={trackName}
-                playing={playing}
-                currentMinutes={currentMinutes}
-                currentSecondsStr={currentSecondsStr}
-                durationMinutes={durationMinutes}
-                durationSecondsStr={durationSecondsStr}
-                artistName={artistName}
-                albumArt={albumArt}
-                albumName={albumName}
-                position={position}
-                duration={duration}
-                onPrevClick={this.onPrevClick}
-                onPlayClick={this.onPlayClick}
-                onNextClick={this.onNextClick}
+      <div className="App-main">
+        {loggedIn ? (
+          <PlaybackBar
+            trackName={trackName}
+            playing={playing}
+            currentMinutes={currentMinutes}
+            currentSecondsStr={currentSecondsStr}
+            durationMinutes={durationMinutes}
+            durationSecondsStr={durationSecondsStr}
+            artistName={artistName}
+            albumArt={albumArt}
+            albumName={albumName}
+            position={position}
+            duration={duration}
+            onPrevClick={this.onPrevClick}
+            onPlayClick={this.onPlayClick}
+            onNextClick={this.onNextClick}
+          />
+        ) : (
+          <div>
+            <p className="App-intro">Not logged in</p>
+            <p>
+              <input
+                type="text"
+                value={token}
+                onChange={e => this.setState({ token: e.target.value })}
               />
-            </div>
-          ) : (
-            <div>
-              <p className="App-intro">Not logged in</p>
-              <p>
-                <input
-                  type="text"
-                  value={token}
-                  onChange={e => this.setState({ token: e.target.value })}
-                />
-              </p>
-              <p>
-                <button type="button" onClick={() => this.handleLogin()}>
-                  Login
-                </button>
-              </p>
-            </div>
-          )}
-        </div>
+            </p>
+            <p>
+              <button type="button" onClick={() => this.handleLogin()}>
+                Login
+              </button>
+            </p>
+          </div>
+        )}
         <Snackbar
           anchorOrigin={{
             vertical: "bottom",
