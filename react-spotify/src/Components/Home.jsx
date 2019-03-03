@@ -9,6 +9,8 @@ import { withStyles } from "@material-ui/core/styles";
 import MySnackbarContentWrapper from "./MySnackbarContentWrapper";
 import PlaybackBar from "./PlaybackBar";
 import * as authActions from "../actions/auth";
+import PlaylistTracks from "./PlaylistTracks";
+import Sidebar from "./Sidebar";
 
 const styles = theme => ({
   button: {
@@ -85,6 +87,7 @@ class Home extends Component {
         });
         this.props.authActions.setAccessToken(accessToken);
         this.props.authActions.userDetails(accessToken);
+        this.props.authActions.loadPlaylists(accessToken);
 
         fetch("https://api.spotify.com/v1/me/player/recently-played", {
           headers: {
@@ -183,8 +186,12 @@ class Home extends Component {
     );
   }
 
+  onPlaylistClick = playlist => {
+    this.props.authActions.loadPlaylist(this.props.accessToken, playlist.id);
+  };
+
   render() {
-    // const { classes } = this.props;
+    const { playlists, playlist } = this.props;
     const {
       token,
       loggedIn,
@@ -212,22 +219,29 @@ class Home extends Component {
     return (
       <div className="App-main">
         {loggedIn ? (
-          <PlaybackBar
-            trackName={trackName}
-            playing={playing}
-            currentMinutes={currentMinutes}
-            currentSecondsStr={currentSecondsStr}
-            durationMinutes={durationMinutes}
-            durationSecondsStr={durationSecondsStr}
-            artistName={artistName}
-            albumArt={albumArt}
-            albumName={albumName}
-            position={position}
-            duration={duration}
-            onPrevClick={this.onPrevClick}
-            onPlayClick={this.onPlayClick}
-            onNextClick={this.onNextClick}
-          />
+          <>
+            <Sidebar
+              playlists={playlists}
+              onPlaylistClick={this.onPlaylistClick}
+            />
+            <PlaylistTracks tracks={playlist} />
+            <PlaybackBar
+              trackName={trackName}
+              playing={playing}
+              currentMinutes={currentMinutes}
+              currentSecondsStr={currentSecondsStr}
+              durationMinutes={durationMinutes}
+              durationSecondsStr={durationSecondsStr}
+              artistName={artistName}
+              albumArt={albumArt}
+              albumName={albumName}
+              position={position}
+              duration={duration}
+              onPrevClick={this.onPrevClick}
+              onPlayClick={this.onPlayClick}
+              onNextClick={this.onNextClick}
+            />
+          </>
         ) : (
           <div>
             <p className="App-intro">Not logged in</p>
@@ -269,7 +283,9 @@ class Home extends Component {
 const mapStateToProps = state => {
   return {
     userDetails: state.userDetails,
-    accessToken: state.accessToken
+    accessToken: state.accessToken,
+    playlists: state.playlists,
+    playlist: state.playlist
   };
 };
 

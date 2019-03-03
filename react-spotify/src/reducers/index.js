@@ -1,4 +1,9 @@
-import { USER_DETAILS, SET_ACCESS_TOKEN } from "../actions/auth";
+import {
+  USER_DETAILS,
+  SET_ACCESS_TOKEN,
+  USER_PLAYLISTS,
+  USER_PLAYLIST
+} from "../actions/auth";
 
 const initialState = {
   username: "",
@@ -11,6 +16,10 @@ function rootReducer(state = initialState, action) {
       return { ...state, userDetails: action.payload };
     case SET_ACCESS_TOKEN:
       return { ...state, accessToken: action.payload };
+    case USER_PLAYLISTS:
+      return { ...state, playlists: action.payload };
+    case USER_PLAYLIST:
+      return { ...state, playlist: action.payload };
     default:
       return state;
   }
