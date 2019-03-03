@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators, compose } from "redux";
 import "../App.css";
 import Snackbar from "@material-ui/core/Snackbar";
 import grey from "@material-ui/core/colors/grey";
@@ -6,6 +8,7 @@ import queryString from "query-string";
 import { withStyles } from "@material-ui/core/styles";
 import MySnackbarContentWrapper from "./MySnackbarContentWrapper";
 import PlaybackBar from "./PlaybackBar";
+import * as authActions from "../actions/auth";
 
 const styles = theme => ({
   button: {
@@ -80,6 +83,8 @@ class Home extends Component {
           snackbarVariant: "success",
           snackbarMessage: "Connected!"
         });
+        this.props.authActions.setAccessToken(accessToken);
+        this.props.authActions.userDetails(accessToken);
 
         fetch("https://api.spotify.com/v1/me/player/recently-played", {
           headers: {
@@ -261,4 +266,23 @@ class Home extends Component {
   }
 }
 
-export default withStyles(styles)(Home);
+const mapStateToProps = state => {
+  return {
+    userDetails: state.userDetails,
+    accessToken: state.accessToken
+  };
+};
+
+function mapDispatchToProps(dispatch) {
+  return {
+    authActions: bindActionCreators(authActions, dispatch)
+  };
+}
+
+export default compose(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
+  withStyles(styles)
+)(Home);

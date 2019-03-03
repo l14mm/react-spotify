@@ -1,4 +1,6 @@
 import React from "react";
+import { connect } from "react-redux";
+import { compose } from "redux";
 import { withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -13,21 +15,36 @@ const styles = theme => ({
     justifyContent: "center",
     fontSize: "calc(10px + 2vmin)",
     color: "white"
-  }
+  },
+  title: { flexGrow: 1 }
 });
 
-const Header = ({ classes }) => {
+const Header = ({ classes, userDetails }) => {
   return (
     <div className={classes.header}>
       <AppBar color="primary" position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6" color="inherit">
+          <Typography variant="h6" color="inherit" className={classes.title}>
             React Spotify Player
           </Typography>
+          {userDetails && (
+            <Typography variant="h6" color="inherit">
+              {userDetails.display_name}
+            </Typography>
+          )}
         </Toolbar>
       </AppBar>
     </div>
   );
 };
 
-export default withStyles(styles)(Header);
+const mapStateToProps = state => {
+  return {
+    userDetails: state.userDetails
+  };
+};
+
+export default compose(
+  connect(mapStateToProps),
+  withStyles(styles)
+)(Header);
