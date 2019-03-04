@@ -24,7 +24,7 @@ const Header = ({ classes, userDetails }) => {
     <div className={classes.header}>
       <AppBar color="primary" position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h5" color="inherit" className={classes.title}>
             React Spotify Player
           </Typography>
           {userDetails && (

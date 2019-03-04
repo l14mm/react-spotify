@@ -1,5 +1,4 @@
 import React from "react";
-import "../App.css";
 import grey from "@material-ui/core/colors/grey";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Card from "@material-ui/core/Card";

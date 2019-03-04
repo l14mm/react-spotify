@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import Divider from "@material-ui/core/Divider";
@@ -43,7 +43,6 @@ const Sidebar = ({ classes, playlists, onPlaylistClick }) => {
     >
       <div className={classes.toolbar} />
       <Divider />
-
       <List>
         {playlists &&
           playlists.map(playlist => (
