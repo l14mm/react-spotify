@@ -16,6 +16,7 @@ const Playlists = ({ playlists, classes, onPlaylistClick, mode = "list" }) => {
         <Typography
           variant="h5"
           color="primary"
+          key={playlist.name}
           onClick={() => onPlaylistClick(playlist)}
         >
           {playlist.name}
