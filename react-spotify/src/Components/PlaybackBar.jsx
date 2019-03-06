@@ -14,22 +14,10 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 
 const styles = theme => ({
-  button: {
-    margin: theme.spacing.unit
-  },
-  buttonHover: {
-    margin: theme.spacing.unit * 2,
-    color: grey[500],
-    "&:hover": {
-      color: "white"
-    }
-  },
-  margin: {
-    margin: theme.spacing.unit
-  },
   card: {
     display: "flex",
-    color: "black"
+    color: "black",
+    margin: "auto"
   },
   details: {
     display: "flex",

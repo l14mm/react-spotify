@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { bindActionCreators, compose } from "redux";
 import "../App.css";
 import Snackbar from "@material-ui/core/Snackbar";
-import grey from "@material-ui/core/colors/grey";
 import queryString from "query-string";
 import { withStyles } from "@material-ui/core/styles";
 import MySnackbarContentWrapper from "./MySnackbarContentWrapper";
@@ -11,44 +10,14 @@ import PlaybackBar from "./PlaybackBar";
 import * as authActions from "../actions/auth";
 import PlaylistTracks from "./PlaylistTracks";
 import Sidebar from "./Sidebar";
+import Header from "./Header";
 
 const styles = theme => ({
-  button: {
-    margin: theme.spacing.unit
-  },
-  buttonHover: {
-    margin: theme.spacing.unit * 2,
-    color: grey[500],
-    "&:hover": {
-      color: "white"
-    }
-  },
-  margin: {
-    margin: theme.spacing.unit
-  },
-  card: {
-    display: "flex",
-    color: "black"
-  },
-  details: {
+  toolbar: theme.mixins.toolbar,
+  main: {
+    width: "100%",
     display: "flex",
     flexDirection: "column"
-  },
-  content: {
-    flex: "1 0 auto"
-  },
-  cover: {
-    width: 151
-  },
-  controls: {
-    display: "flex",
-    alignItems: "center",
-    paddingLeft: theme.spacing.unit,
-    paddingBottom: theme.spacing.unit
-  },
-  playIcon: {
-    height: 38,
-    width: 38
   }
 });
 
@@ -191,7 +160,7 @@ class Home extends Component {
   };
 
   render() {
-    const { playlists, playlist } = this.props;
+    const { playlists, playlist, classes } = this.props;
     const {
       token,
       loggedIn,
@@ -224,23 +193,27 @@ class Home extends Component {
               playlists={playlists}
               onPlaylistClick={this.onPlaylistClick}
             />
-            <PlaylistTracks tracks={playlist} />
-            <PlaybackBar
-              trackName={trackName}
-              playing={playing}
-              currentMinutes={currentMinutes}
-              currentSecondsStr={currentSecondsStr}
-              durationMinutes={durationMinutes}
-              durationSecondsStr={durationSecondsStr}
-              artistName={artistName}
-              albumArt={albumArt}
-              albumName={albumName}
-              position={position}
-              duration={duration}
-              onPrevClick={this.onPrevClick}
-              onPlayClick={this.onPlayClick}
-              onNextClick={this.onNextClick}
-            />
+            <Header />
+            <div className={classes.main}>
+              <div className={classes.toolbar} />
+              <PlaylistTracks tracks={playlist} />
+              <PlaybackBar
+                trackName={trackName}
+                playing={playing}
+                currentMinutes={currentMinutes}
+                currentSecondsStr={currentSecondsStr}
+                durationMinutes={durationMinutes}
+                durationSecondsStr={durationSecondsStr}
+                artistName={artistName}
+                albumArt={albumArt}
+                albumName={albumName}
+                position={position}
+                duration={duration}
+                onPrevClick={this.onPrevClick}
+                onPlayClick={this.onPlayClick}
+                onNextClick={this.onNextClick}
+              />
+            </div>
           </>
         ) : (
           <div>

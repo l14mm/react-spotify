@@ -21,14 +21,11 @@ const styles = theme => ({
     flexShrink: 0
   },
   drawerPaper: {
-    width: drawerWidth
+    width: drawerWidth,
+    backgroundColor: theme.palette.background.main
   },
   toolbar: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3
-  }
+  primaryText: { color: theme.palette.secondary.main }
 });
 
 const Sidebar = ({ classes, playlists, onPlaylistClick }) => {
@@ -51,7 +48,10 @@ const Sidebar = ({ classes, playlists, onPlaylistClick }) => {
               key={playlist.name}
               onClick={() => onPlaylistClick(playlist)}
             >
-              <ListItemText primary={playlist.name} />
+              <ListItemText
+                classes={{ primary: classes.primaryText }}
+                primary={playlist.name}
+              />
             </ListItem>
           ))}
       </List>

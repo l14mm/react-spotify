@@ -1,7 +1,11 @@
-import React, { Component } from "react";
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import React from "react";
+import {
+  MuiThemeProvider,
+  createMuiTheme,
+  withStyles
+} from "@material-ui/core/styles";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import Header from "./Components/Header";
+import grey from "@material-ui/core/colors/grey";
 import Home from "./Components/Home";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
@@ -13,10 +17,13 @@ const store = createStore(rootReducer, applyMiddleware(reduxThunk));
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#000063"
+      main: grey[900]
     },
     secondary: {
       main: "#FFF"
+    },
+    background: {
+      main: grey[900]
     }
   },
   typography: {
@@ -24,28 +31,26 @@ const theme = createMuiTheme({
   }
 });
 
-class App extends Component {
-  render() {
-    return (
-      <MuiThemeProvider theme={theme}>
-        <Provider store={store}>
-          <Router>
-            <div
-              className="App"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                height: "100vh"
-              }}
-            >
-              <Header />
-              <Route exact path="/" component={Home} />
-            </div>
-          </Router>
-        </Provider>
-      </MuiThemeProvider>
-    );
+const styles = {
+  App: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh"
   }
-}
+};
 
-export default App;
+const App = ({ classes }) => {
+  return (
+    <MuiThemeProvider theme={theme}>
+      <Provider store={store}>
+        <Router>
+          <div className={classes.App}>
+            <Route exact path="/" component={Home} />
+          </div>
+        </Router>
+      </Provider>
+    </MuiThemeProvider>
+  );
+};
+
+export default withStyles(styles)(App);

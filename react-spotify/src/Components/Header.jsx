@@ -6,6 +6,8 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 
+const drawerWidth = 200;
+
 const styles = theme => ({
   header: {
     backgroundColor: "#282c34",
@@ -14,27 +16,29 @@ const styles = theme => ({
     alignItems: "center",
     justifyContent: "center",
     fontSize: "calc(10px + 2vmin)",
-    color: "white"
+    color: "white",
+
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: drawerWidth
   },
-  title: { flexGrow: 1 }
+  title: { flexGrow: 1 },
+  toolbar: { width: "95%" }
 });
 
 const Header = ({ classes, userDetails }) => {
   return (
-    <div className={classes.header}>
-      <AppBar color="primary" position="static">
-        <Toolbar variant="dense">
-          <Typography variant="h5" color="inherit" className={classes.title}>
-            React Spotify Player
+    <AppBar color="primary" position="fixed" className={classes.header}>
+      <Toolbar variant="dense" className={classes.toolbar}>
+        <Typography variant="h5" color="inherit" className={classes.title}>
+          React Spotify Player
+        </Typography>
+        {userDetails && (
+          <Typography variant="h6" color="inherit">
+            Welcome {userDetails.display_name}
           </Typography>
-          {userDetails && (
-            <Typography variant="h6" color="inherit">
-              {userDetails.display_name}
-            </Typography>
-          )}
-        </Toolbar>
-      </AppBar>
-    </div>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 };
 
