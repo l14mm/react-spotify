@@ -127,7 +127,7 @@ class Home extends Component {
     this.player.nextTrack();
   }
 
-  handleClose = (event, reason) => {
+  handleClose = (_, reason) => {
     if (reason !== "clickaway") {
       this.setState({ snackbarOpen: false });
     }
@@ -135,6 +135,18 @@ class Home extends Component {
 
   playTrack(track) {
     const currentTrack = track.track;
+    const { position } = this.state;
+
+    if (!currentTrack.preview_url) {
+      this.setState({
+        loggedIn: true,
+        snackbarOpen: true,
+        snackbarVariant: "error",
+        snackbarMessage: "No track preview available"
+      });
+      return;
+    }
+
     this.setState({
       position: 0,
       duration: currentTrack.duration_ms,
@@ -145,10 +157,10 @@ class Home extends Component {
       playing: true
     });
 
+    this.audio && this.audio.pause();
     this.audio = new Audio(currentTrack.preview_url);
     this.audio.play();
 
-    const { position } = this.state;
     this.timer = setInterval(
       () => this.setState({ position: position + 1000 }),
       1000
@@ -157,6 +169,10 @@ class Home extends Component {
 
   onPlaylistClick = playlist => {
     this.props.authActions.loadPlaylist(this.props.accessToken, playlist.id);
+  };
+
+  onTrackClick = track => {
+    this.playTrack(track);
   };
 
   render() {
@@ -180,7 +196,7 @@ class Home extends Component {
     const durationMinutes = Math.floor(dur / 60);
     const durationSeconds = dur - durationMinutes * 60;
     const durationSecondsStr =
-      durationSeconds < 10 ? `0${durationSeconds}` : durationSeconds;
+      durationSeconds < 10 ? `0${durationSeconds}` : `${durationSeconds}`;
     const currentMinutes = Math.floor(pos / 60);
     const currentSeconds = pos - currentMinutes * 60;
     const currentSecondsStr =
@@ -196,7 +212,10 @@ class Home extends Component {
             <Header />
             <div className={classes.main}>
               <div className={classes.toolbar} />
-              <PlaylistTracks tracks={playlist} />
+              <PlaylistTracks
+                tracks={playlist}
+                onTrackClick={this.onTrackClick}
+              />
               <PlaybackBar
                 trackName={trackName}
                 playing={playing}

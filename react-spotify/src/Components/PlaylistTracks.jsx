@@ -18,8 +18,7 @@ const styles = {
   }
 };
 
-const PlaylistTracks = ({ tracks, classes }) => {
-  console.log(tracks);
+const PlaylistTracks = ({ tracks, classes, onTrackClick }) => {
   return tracks ? (
     <List className={classes.root}>
       {tracks.map(track => (
@@ -28,6 +27,7 @@ const PlaylistTracks = ({ tracks, classes }) => {
           key={`${track.track.name} ${track.track.artists[0].name} ${
             track.track.album.name
           }`}
+          onClick={() => onTrackClick(track)}
         >
           <ListItemText
             classes={{
